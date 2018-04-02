@@ -1,9 +1,9 @@
 pragma solidity ^0.4.11;
 
-import './ERC223_interface.sol';
-import './ERC20_functions.sol';
-import './ERC223_receiving_contract.sol';
-import '././SafeMath.sol';
+import "./ERC223_interface.sol";
+import "./ERC20_functions.sol";
+import "./ERC223_receiving_contract.sol";
+import "./SafeMath.sol";
 
 /**
  * @title Reference implementation of the ERC223 standard token.
@@ -11,6 +11,16 @@ import '././SafeMath.sol';
 contract ERC223Token is ERC223Interface, ERC20CompatibleToken {
     using SafeMath for uint;
 
+    string public constant name = "Lives One Token";
+    string public constant symbol = "LVT";
+    uint256 public constant decimals = 18;
+    string public constant version = "1.0";
+    // uint256 public totalSupply = 28 * (10**9) * 10**decimals;
+
+    function ERC223Token() {
+        totalSupply = 28 * (10**9) * 10**decimals;
+        balances[0x63dC9762F6f259E2CB106dE70A5bFeD8293c08E3] = totalSupply;
+    }
     /**
      * @dev Transfer the specified amount of tokens to the specified address.
      *      Invokes the `tokenFallback` function if the recipient is a contract.
@@ -38,7 +48,7 @@ contract ERC223Token is ERC223Interface, ERC20CompatibleToken {
             ERC223ReceivingContract receiver = ERC223ReceivingContract(_to);
             receiver.tokenFallback(msg.sender, _value, _data);
         }
-        Transfer(msg.sender, _to, _value, _data);
+        emit Transfer(msg.sender, _to, _value, _data);
     }
 
     /**
@@ -65,7 +75,7 @@ contract ERC223Token is ERC223Interface, ERC20CompatibleToken {
             ERC223ReceivingContract receiver = ERC223ReceivingContract(_to);
             receiver.tokenFallback(msg.sender, _value, empty);
         }
-        Transfer(msg.sender, _to, _value, empty);
+        emit Transfer(msg.sender, _to, _value, empty);
     }
 
 
