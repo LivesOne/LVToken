@@ -8,18 +8,21 @@ import "./SafeMath.sol";
 /**
  * @title Reference implementation of the ERC223 standard token.
  */
-contract ERC223Token is ERC223Interface, ERC20CompatibleToken {
+contract LVToken is ERC223Interface, ERC20CompatibleToken {
     using SafeMath for uint;
 
     string public constant name = "Lives One Token";
     string public constant symbol = "LVT";
     uint256 public constant decimals = 18;
-    string public constant version = "1.0";
+    string public constant version = "2.0";
     // uint256 public totalSupply = 28 * (10**9) * 10**decimals;
 
-    function ERC223Token() {
+    function LVToken() {
         totalSupply = 28 * (10**9) * 10**decimals;
-        balances[0x63dC9762F6f259E2CB106dE70A5bFeD8293c08E3] = totalSupply;
+        balances[0xd5a375Dd13abEF145B8183E6C2380BC777614395] = 28 * (10**8) * 10**decimals;              //team, 10%
+        balances[0x22164b69c71DcF12E1dc037BB43933449f342a69] = 140 * (10**8) * 10**decimals;             //miner, 50%
+        balances[0xBDC44A4EA8A9640ee5DcF2E0425d7A262C830c62] = 56 * (10**8) * 10**decimals;              //pre-ico, 20%
+        balances[0x32A3A725895F1BdcFC1FEf8340f9f26d49Af60ab] = 56 * (10**8) * 10**decimals;              //organization, 20%        
     }
     /**
      * @dev Transfer the specified amount of tokens to the specified address.
