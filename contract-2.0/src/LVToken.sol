@@ -17,7 +17,7 @@ contract LVToken is ERC223Interface, ERC20CompatibleToken {
     string public constant version = "2.0";
     // uint256 public totalSupply = 28 * (10**9) * 10**decimals;
 
-    function LVToken() {
+    function LVToken() public {
         totalSupply = 28 * (10**9) * 10**decimals;
         balances[0xd5a375Dd13abEF145B8183E6C2380BC777614395] = 28 * (10**8) * 10**decimals;              //team, 10%
         balances[0x22164b69c71DcF12E1dc037BB43933449f342a69] = 140 * (10**8) * 10**decimals;             //miner, 50%
@@ -35,7 +35,7 @@ contract LVToken is ERC223Interface, ERC20CompatibleToken {
      * @param _value Amount of tokens that will be transferred.
      * @param _data  Transaction metadata.
      */
-    function transfer(address _to, uint _value, bytes _data) {
+    function transfer(address _to, uint _value, bytes _data) public {
         // Standard function transfer similar to ERC20 transfer with no _data .
         // Added due to backwards compatibility reasons .
         uint codeLength;
@@ -63,7 +63,7 @@ contract LVToken is ERC223Interface, ERC20CompatibleToken {
      * @param _to    Receiver address.
      * @param _value Amount of tokens that will be transferred.
      */
-    function transfer(address _to, uint _value) {
+    function transfer(address _to, uint _value) public {
         uint codeLength;
         bytes memory empty;
 
@@ -88,7 +88,7 @@ contract LVToken is ERC223Interface, ERC20CompatibleToken {
      * @param _owner   The address whose balance will be returned.
      * @return balance Balance of the `_owner`.
      */
-    function balanceOf(address _owner) constant returns (uint balance) {
+    function balanceOf(address _owner) public view returns (uint balance) {
         return balances[_owner];
     }
 }
