@@ -80,7 +80,7 @@ contract LVToken {
         permits[msg.sender] = 1;
         uint sum = permits[addr_team] + permits[addr_miner] + permits[addr_ico] + permits[addr_org];
         if (sum >= 2) {
-          freezed = true;
+            freezed = true;
         }
         emit Freeze(msg.sender, sum);
     }
