@@ -84,6 +84,9 @@ contract LVToken {
     }
 
     function transferAndCall(address _to, uint _value, bytes _data) public {
+        //this function is allowed before freezed
+        require(!freezed);
+
         //make the transfer
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
