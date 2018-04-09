@@ -34,7 +34,7 @@ contract LVToken {
         permits[addr_org] = 0;
     }
 
-    function transfer(address _to, uint _value) public returns (bool success) {
+    function transfer(address _to, uint _value) public returns (bool) {
         require(!freezed);
         require(_value > 0);
         require(balances[msg.sender] >= _value);
@@ -45,7 +45,7 @@ contract LVToken {
         return true;
     }
 
-    function transferFrom(address _from, address _to, uint _value) public returns (bool success) {
+    function transferFrom(address _from, address _to, uint _value) public returns (bool) {
         require(!freezed);
         require(_value > 0);
         require(balances[_from] >= _value);
@@ -57,11 +57,11 @@ contract LVToken {
         emit Transfer(_from, _to, _value);
     }
 
-    function balanceOf(address _owner) constant public returns (uint balance) {
+    function balanceOf(address _owner) constant public returns (uint) {
         return balances[_owner];
     }
 
-    function approve(address _spender, uint _value) public returns (bool success) {
+    function approve(address _spender, uint _value) public returns (bool) {
         require(!freezed);
         
         allowed[msg.sender][_spender] = _value;
@@ -69,7 +69,7 @@ contract LVToken {
         return true;
     }
 
-    function allowance(address _owner, address _spender) constant public returns (uint remaining) {
+    function allowance(address _owner, address _spender) constant public returns (uint) {
         return allowed[_owner][_spender];
     }
 
