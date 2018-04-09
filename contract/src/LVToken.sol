@@ -21,6 +21,7 @@ contract LVToken {
     address public constant addr_ico = 0xBDC44A4EA8A9640ee5DcF2E0425d7A262C830c62;
     address public constant addr_org = 0x32A3A725895F1BdcFC1FEf8340f9f26d49Af60ab;
 
+    //28 billion total
     uint public totalSupply = 28 * (10**9) * (10**decimals);
 
     event Transfer(address indexed _from, address indexed _to, uint _value);
@@ -83,6 +84,10 @@ contract LVToken {
         return allowed[_owner][_spender];
     }
 
+    /**
+     * if the receiver contract implements the LVTReceiver interface, this function is prefered comparing to 
+     * approve+transferFrom(1 transaction vs 2 transactions), which will save the fee
+     */
     function transferAndCall(address _to, uint _value, bytes _data) public {
         //this function is allowed before freezed
         require(!freezed);
@@ -106,6 +111,9 @@ contract LVToken {
         transferAndCall(_to, _value, empty);
     }
 
+    /**
+     * as we are going to 1:1 swap to LVT-chain in the future, all the transactions in ethereum will be freezed at that time
+     */    
     function freeze() public {
         //this function is allowed before freezed
         require(!freezed);
