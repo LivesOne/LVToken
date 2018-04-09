@@ -84,9 +84,12 @@ contract LVToken {
     }
 
     function transferAndCall(address _to, uint _value, bytes _data) public {
+        //make the transfer
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
 
+        //as assumed, the to should implement the LVTReceiver interface to accept LVT,
+        //otherwise, this function will fail
         LVTReceiver receiver = LVTReceiver(_to);
         receiver.tokenFallback(msg.sender, _value, _data);
 
@@ -96,17 +99,21 @@ contract LVToken {
 
     function transferAndCall(address _to, uint _value) public {
         bytes memory empty;
-
+        //call the transferAndCall with empty memory
         transferAndCall(_to, _value, empty);
     }
 
     function freeze() public {
+        //this function is allowed before freezed
         require(!freezed);
+        //only the pre-allocated address can run this function
         require(msg.sender == addr_team || msg.sender == addr_miner || msg.sender == addr_ico || msg.sender == addr_org);
-        
+        //set to 1 of the caller
         permits[msg.sender] = 1;
+        //sum all the addresses's setting
         uint sum = permits[addr_team] + permits[addr_miner] + permits[addr_ico] + permits[addr_org];
         if (sum >= 2) {
+            //the token is freezed if at least 2 address has run this function
             freezed = true;
         }
         emit Freeze(msg.sender, sum);
