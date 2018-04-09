@@ -1,6 +1,11 @@
-pragma solidity ^0.4.10;
+pragma solidity ^0.4.11;
+
+import "./LVTReceiver.sol";
+import "./SafeMath.sol";
 
 contract LVToken {
+    using SafeMath for uint;
+
     string public constant name = "Lives One Token";
     string public constant symbol = "LVT";
     uint public constant decimals = 18;
@@ -16,17 +21,18 @@ contract LVToken {
     address public constant addr_ico = 0xBDC44A4EA8A9640ee5DcF2E0425d7A262C830c62;
     address public constant addr_org = 0x32A3A725895F1BdcFC1FEf8340f9f26d49Af60ab;
 
-    uint public totalSupply = 28 * (10**9) * 10**decimals;
+    uint public totalSupply = 28 * (10**9) * (10**decimals);
 
     event Transfer(address indexed _from, address indexed _to, uint _value);
+    event TransferAndCall(address indexed _from, address indexed _to, uint _value, bytes _data);
     event Approval(address indexed _owner, address indexed _spender, uint _value);
     event Freeze(address indexed _from, uint _sum);
 
     function LVToken() public {
-        balances[addr_team] = 28 * (10**8) * 10**decimals;              //team, 10%
-        balances[addr_miner] = 140 * (10**8) * 10**decimals;             //miner, 50%
-        balances[addr_ico] = 56 * (10**8) * 10**decimals;              //pre-ico, 20%
-        balances[addr_org] = 56 * (10**8) * 10**decimals;              //organization, 20%
+        balances[addr_team] = 28 * (10**8) * (10**decimals);              //team, 10%
+        balances[addr_miner] = 140 * (10**8) * (10**decimals);             //miner, 50%
+        balances[addr_ico] = 56 * (10**8) * (10**decimals);              //pre-ico, 20%
+        balances[addr_org] = 56 * (10**8) * (10**decimals);              //organization, 20%
 
         permits[addr_team] = 0;
         permits[addr_miner] = 0;
@@ -37,24 +43,26 @@ contract LVToken {
     function transfer(address _to, uint _value) public returns (bool) {
         require(!freezed);
         require(_value > 0);
-        require(balances[msg.sender] >= _value);
 
-        balances[msg.sender] -= _value;
-        balances[_to] += _value;
+        balances[msg.sender] = balances[msg.sender].sub(_value);
+        balances[_to] = balances[_to].add(_value);
+
         emit Transfer(msg.sender, _to, _value);
+
         return true;
     }
 
     function transferFrom(address _from, address _to, uint _value) public returns (bool) {
         require(!freezed);
         require(_value > 0);
-        require(balances[_from] >= _value);
-        require(allowed[_from][msg.sender] >= _value);
 
-        balances[_to] += _value;
-        balances[_from] -= _value;
-        allowed[_from][msg.sender] -= _value;
+        balances[_from] = balances[_from].sub(_value);
+        allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
+        balances[_to] = balances[_to].add(_value);
+
         emit Transfer(_from, _to, _value);
+
+        return true;
     }
 
     function balanceOf(address _owner) constant public returns (uint) {
@@ -65,12 +73,31 @@ contract LVToken {
         require(!freezed);
         
         allowed[msg.sender][_spender] = _value;
+
         emit Approval(msg.sender, _spender, _value);
+
         return true;
     }
 
     function allowance(address _owner, address _spender) constant public returns (uint) {
         return allowed[_owner][_spender];
+    }
+
+    function transferAndCall(address _to, uint _value, bytes _data) public {
+        balances[msg.sender] = balances[msg.sender].sub(_value);
+        balances[_to] = balances[_to].add(_value);
+
+        LVTReceiver receiver = LVTReceiver(_to);
+        receiver.tokenFallback(msg.sender, _value, _data);
+
+        emit Transfer(msg.sender, _to, _value);
+        emit TransferAndCall(msg.sender, _to, _value, _data);
+    }
+
+    function transferAndCall(address _to, uint _value) public {
+        bytes memory empty;
+
+        transferAndCall(_to, _value, empty);
     }
 
     function freeze() public {
