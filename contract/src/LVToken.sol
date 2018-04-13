@@ -25,7 +25,7 @@ contract LVToken {
     uint public totalSupply = 28 * (10**9) * (10**decimals);
 
     event Transfer(address indexed _from, address indexed _to, uint _value);
-    event TransferAndCall(address indexed _from, address indexed _to, uint _value, bytes _data);
+    event TransferAndCall(address indexed _from, address indexed _to, uint _value, bytes indexed _data);
     event Approval(address indexed _owner, address indexed _spender, uint _value);
     event Freeze(address indexed _from, uint _sum);
 
@@ -57,8 +57,9 @@ contract LVToken {
         require(!freezed);
         require(_value > 0);
 
-        balances[_from] = balances[_from].sub(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
+
+        balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
 
         emit Transfer(_from, _to, _value);
@@ -72,6 +73,7 @@ contract LVToken {
 
     function approve(address _spender, uint _value) public returns (bool) {
         require(!freezed);
+        require((_value == 0) || (allowed[msg.sender][_spender] == 0));
         
         allowed[msg.sender][_spender] = _value;
 
@@ -96,7 +98,7 @@ contract LVToken {
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
 
-        //as assumed, the to should implement the LVTReceiver interface to accept LVT,
+        //as assumed, the "to" contract should implement the LVTReceiver interface to accept LVT,
         //otherwise, this function will fail
         LVTReceiver receiver = LVTReceiver(_to);
         receiver.tokenFallback(msg.sender, _value, _data);
@@ -118,7 +120,7 @@ contract LVToken {
         //this function is allowed before freezed
         require(!freezed);
         //only the pre-allocated address can run this function
-        require(msg.sender == addr_team || msg.sender == addr_miner || msg.sender == addr_ico || msg.sender == addr_org);
+        require((msg.sender == addr_team) || (msg.sender == addr_miner) || (msg.sender == addr_ico) || (msg.sender == addr_org));
         //set to 1 of the caller
         permits[msg.sender] = 1;
         //sum all the addresses's setting
