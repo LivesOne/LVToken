@@ -13,14 +13,14 @@ library SafeMath {
     }
 
     function div(uint a, uint b) pure internal returns (uint) {
-        assert(b != 0);
+        require(b > 0);
         uint c = a / b;
         return c;
     }
     */
 
     function sub(uint a, uint b) pure internal returns (uint) {
-        assert(b <= a);
+        require(b <= a);
         return a - b;
     }
 
