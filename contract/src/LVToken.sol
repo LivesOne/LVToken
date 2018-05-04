@@ -6,8 +6,8 @@ import "./SafeMath.sol";
 contract LVToken {
     using SafeMath for uint;
 
-    string public constant name = "Lives One Token";
-    string public constant symbol = "LVT";
+    string public constant name = "LivesOne Token on Chain";
+    string public constant symbol = "LVTC";
     uint public constant decimals = 18;
     string public constant version = "1.0";
 
