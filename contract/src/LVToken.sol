@@ -1,6 +1,5 @@
 pragma solidity ^0.4.11;
 
-import "./LVTReceiver.sol";
 import "./SafeMath.sol";
 
 contract LVToken {
