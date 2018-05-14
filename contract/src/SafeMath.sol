@@ -20,7 +20,7 @@ library SafeMath {
     */
 
     function sub(uint a, uint b) pure internal returns (uint) {
-        require(b <= a);
+        assert(b <= a);
         return a - b;
     }
 

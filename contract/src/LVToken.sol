@@ -8,7 +8,7 @@ contract LVToken {
 
     string public constant name = "LivesOne Token on Chain";
     string public constant symbol = "LVTC";
-    uint public constant decimals = 18;
+    uint8 public constant decimals = 18;
     string public constant version = "1.0";
 
     mapping (address => uint) balances;
@@ -22,18 +22,17 @@ contract LVToken {
     address public constant addr_org = 0x32A3A725895F1BdcFC1FEf8340f9f26d49Af60ab;
 
     //28 billion total
-    uint public totalSupply = 28 * (10**9) * (10**decimals);
+    uint public totalSupply = 28 * (10**9) * (10**uint(decimals));
 
     event Transfer(address indexed _from, address indexed _to, uint _value);
-    event TransferAndCall(address indexed _from, address indexed _to, uint _value, bytes indexed _data);
     event Approval(address indexed _owner, address indexed _spender, uint _value);
     event Freeze(address indexed _from, uint _sum);
 
     function LVToken() public {
-        balances[addr_team] = 28 * (10**8) * (10**decimals);              //team, 10%
-        balances[addr_miner] = 140 * (10**8) * (10**decimals);             //miner, 50%
-        balances[addr_ico] = 56 * (10**8) * (10**decimals);              //pre-ico, 20%
-        balances[addr_org] = 56 * (10**8) * (10**decimals);              //organization, 20%
+        balances[addr_team] = 28 * (10**8) * (10**uint(decimals));              //team, 10%
+        balances[addr_miner] = 140 * (10**8) * (10**uint(decimals));             //miner, 50%
+        balances[addr_ico] = 56 * (10**8) * (10**uint(decimals));              //pre-ico, 20%
+        balances[addr_org] = 56 * (10**8) * (10**uint(decimals));              //organization, 20%
 
         permits[addr_team] = 0;
         permits[addr_miner] = 0;
@@ -84,33 +83,6 @@ contract LVToken {
 
     function allowance(address _owner, address _spender) constant public returns (uint) {
         return allowed[_owner][_spender];
-    }
-
-    /**
-     * if the receiver contract implements the LVTReceiver interface, this function is prefered comparing to 
-     * approve+transferFrom(1 transaction vs 2 transactions), which will save the fee
-     */
-    function transferAndCall(address _to, uint _value, bytes _data) public {
-        //this function is allowed before freezed
-        require(!freezed);
-
-        //make the transfer
-        balances[msg.sender] = balances[msg.sender].sub(_value);
-        balances[_to] = balances[_to].add(_value);
-
-        //as assumed, the "to" contract should implement the LVTReceiver interface to accept LVT,
-        //otherwise, this function will fail
-        LVTReceiver receiver = LVTReceiver(_to);
-        receiver.tokenFallback(msg.sender, _value, _data);
-
-        emit Transfer(msg.sender, _to, _value);
-        emit TransferAndCall(msg.sender, _to, _value, _data);
-    }
-
-    function transferAndCall(address _to, uint _value) public {
-        bytes memory empty;
-        //call the transferAndCall with empty memory
-        transferAndCall(_to, _value, empty);
     }
 
     /**
