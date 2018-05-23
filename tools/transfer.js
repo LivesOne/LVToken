@@ -41,7 +41,7 @@ var sendtoken = async function(keypath, password, token, to, value) {
     value: '0x00', 
     data: data,
     // EIP 155 chainId - mainnet: 1, ropsten: 3
-    // chainId: 3
+    chainId: 3
   }
   // console.log(txParams)
   var tx = new TX(txParams)
